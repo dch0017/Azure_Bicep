@@ -24,9 +24,29 @@
     to use the this script.
 #>
 
-#Get Registration Key
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$azTenantID,
+    [Parameter(mandatory = $true)]
+    [string]$hostPoolName,
+    [Parameter(mandatory = $true)]
+    [string]$resourceGroupName,
+    [Parameter(mandatory = $true)]
+    [string]$appID,
+    [Parameter(mandatory = $true)]
+    [string]$appSecret
+)
+
+
+# Get Registration Key
 Install-Module -Name Az.DesktopVirtualization -AllowClobber -Force
 Import-Module -Name Az.DesktopVirtualization
+
+# Create credential object to connect to Azure
+$Creds= New-Object System.Management.Automation.PSCredential($AppID, (ConvertTo-SecureString $AppSecret -AsPlainText -Force))
+
+Connect-AzAccount -ServicePrincipal -Credential $Creds -TenantID $AzTenantID
+
 $Registered = Get-AzWvdRegistrationInfo -ResourceGroupName "$resourceGroupName" -HostPoolName $HostPoolName
 # if (-not(-Not $Registered.Token)){ 
 #     $registrationTokenValidFor = (NEW-TIMESPAN -Start (get-date) -End $Registered.ExpirationTime | select-object Days,Hours,Minutes,Seconds)
